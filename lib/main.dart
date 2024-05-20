@@ -15,6 +15,87 @@ import 'utils/utils.dart';
 
 void main() => runApp(NetflixApp());
 
+final GlobalKey<NavigatorState> _navigatorState = GlobalKey<NavigatorState>();
+
+final GoRouter router = GoRouter(
+  initialLocation: '/profile',
+  navigatorKey: _navigatorState,
+  routes: [
+    GoRoute(
+      path: '/profile',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ProfileSelectionScreen();
+      },
+    ),
+    ShellRoute(
+      // observers: [_heroController],
+      builder: (context, state, child) {
+        return NetflixScaffold(child: child);
+      },
+      routes: <RouteBase>[
+        GoRoute(
+            name: 'Home',
+            path: '/home',
+            builder: (BuildContext context, GoRouterState state) {
+              return const HomeScreen();
+            },
+            routes: [
+              GoRoute(
+                  name: 'TV Shows',
+                  path: 'tvshows',
+                  builder: (BuildContext context, GoRouterState state) {
+                    return HomeScreen(name: state.name);
+                  },
+                  pageBuilder: (context, state) {
+                    return CustomTransitionPage<void>(
+                        key: state.pageKey,
+                        child: HomeScreen(name: state.name),
+                        transitionDuration: const Duration(milliseconds: 600),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          final status = context.read<AnimationStatusCubit>();
+                          animation.removeStatusListener(status.onStatus);
+                          animation.addStatusListener(status.onStatus);
+                          secondaryAnimation
+                              .removeStatusListener(status.onStatus);
+                          secondaryAnimation.addStatusListener(status.onStatus);
+                          return FadeTransition(
+                              opacity: animation, child: child);
+                        });
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'details',
+                      builder: (BuildContext context, GoRouterState state) {
+                        return MovieDetailsScreen(movie: state.extra as Movie);
+                      },
+                    ),
+                  ]),
+              GoRoute(
+                path: 'details',
+                builder: (BuildContext context, GoRouterState state) {
+                  return MovieDetailsScreen(movie: state.extra as Movie);
+                },
+              ),
+            ]),
+        GoRoute(
+            path: '/newandhot',
+            builder: (BuildContext context, GoRouterState state) {
+              return const NewAndHotScreen();
+            },
+            routes: [
+              GoRoute(
+                path: 'details',
+                builder: (BuildContext context, GoRouterState state) {
+                  return MovieDetailsScreen(movie: state.extra as Movie);
+                },
+              ),
+            ]),
+      ],
+    ),
+  ],
+);
+
 class NetflixApp extends StatelessWidget {
   NetflixApp({super.key});
 
@@ -23,9 +104,9 @@ class NetflixApp extends StatelessWidget {
     return BlocWidget(
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
-        routeInformationProvider: _router.routeInformationProvider,
-        routeInformationParser: _router.routeInformationParser,
-        routerDelegate: _router.routerDelegate,
+        routeInformationProvider: router.routeInformationProvider,
+        routeInformationParser: router.routeInformationParser,
+        routerDelegate: router.routerDelegate,
         title: 'Netflix',
         theme: ThemeData(
             brightness: Brightness.dark,
@@ -41,87 +122,4 @@ class NetflixApp extends StatelessWidget {
       ),
     );
   }
-
-  final GlobalKey<NavigatorState> _navigatorState = GlobalKey<NavigatorState>();
-
-  late final GoRouter _router = GoRouter(
-    initialLocation: '/profile',
-    navigatorKey: _navigatorState,
-    routes: [
-      GoRoute(
-        path: '/profile',
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileSelectionScreen();
-        },
-      ),
-      ShellRoute(
-        // observers: [_heroController],
-        builder: (context, state, child) {
-          return NetflixScaffold(child: child);
-        },
-        routes: <RouteBase>[
-          GoRoute(
-              name: 'Home',
-              path: '/home',
-              builder: (BuildContext context, GoRouterState state) {
-                return const HomeScreen();
-              },
-              routes: [
-                GoRoute(
-                    name: 'TV Shows',
-                    path: 'tvshows',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return HomeScreen(name: state.name);
-                    },
-                    pageBuilder: (context, state) {
-                      return CustomTransitionPage<void>(
-                          key: state.pageKey,
-                          child: HomeScreen(name: state.name),
-                          transitionDuration: const Duration(milliseconds: 600),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            final status = context.read<AnimationStatusCubit>();
-                            animation.removeStatusListener(status.onStatus);
-                            animation.addStatusListener(status.onStatus);
-                            secondaryAnimation
-                                .removeStatusListener(status.onStatus);
-                            secondaryAnimation
-                                .addStatusListener(status.onStatus);
-                            return FadeTransition(
-                                opacity: animation, child: child);
-                          });
-                    },
-                    routes: [
-                      GoRoute(
-                        path: 'details',
-                        builder: (BuildContext context, GoRouterState state) {
-                          return MovieDetailsScreen(
-                              movie: state.extra as Movie);
-                        },
-                      ),
-                    ]),
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) {
-                    return MovieDetailsScreen(movie: state.extra as Movie);
-                  },
-                ),
-              ]),
-          GoRoute(
-              path: '/newandhot',
-              builder: (BuildContext context, GoRouterState state) {
-                return const NewAndHotScreen();
-              },
-              routes: [
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) {
-                    return MovieDetailsScreen(movie: state.extra as Movie);
-                  },
-                ),
-              ]),
-        ],
-      ),
-    ],
-  );
 }

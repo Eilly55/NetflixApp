@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_netflix/main.dart';
 import 'package:flutter_netflix/repository/repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -33,8 +34,8 @@ class NetflixBottomSheet extends StatelessWidget {
           0.65,
           1.0
         ]),
-    child: Row(
-      children: const [
+    child: const Row(
+      children: [
         Text(
           '2022',
           style: TextStyle(color: Colors.grey, fontSize: 14.0),
@@ -189,9 +190,9 @@ class NetflixBottomSheet extends StatelessWidget {
                     )
                   ],
                 ),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const [
+                  children: [
                     BottomSheetButton(
                       icon: Icons.play_arrow,
                       label: 'Play',
@@ -218,7 +219,8 @@ class NetflixBottomSheet extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     Navigator.pop(context);
-                    context.go('${GoRouter.of(context).location}/details',
+                    context.go(
+                        '${router.routerDelegate.currentConfiguration.fullPath}/details',
                         extra: movieDetails);
                   },
                   child: Row(

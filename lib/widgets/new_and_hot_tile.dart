@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_netflix/main.dart';
 import 'package:flutter_netflix/widgets/genre.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,8 @@ class NewAndHotTile extends StatelessWidget {
     var date = movie.releaseDate ?? DateTime.now();
     return InkWell(
       onTap: () {
-        context.go('${GoRouterState.of(context).location}/details',
+        context.go(
+            '${router.routerDelegate.currentConfiguration.fullPath}/details',
             extra: movie);
       },
       child: Row(
